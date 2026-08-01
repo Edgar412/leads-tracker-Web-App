@@ -3,7 +3,8 @@ import { initializeApp } from "https://www.gstatic.com/firebasejs/12.17.0/fireba
 import { getDatabase,
          ref,
          push,
-         onValue } from "https://www.gstatic.com/firebasejs/12.17.0/firebase-database.js";
+         onValue,
+         remove } from "https://www.gstatic.com/firebasejs/12.17.0/firebase-database.js";
 import { firebaseConfig} from "./config.js";
 
 //database varibles
@@ -19,7 +20,8 @@ const ulEl = document.querySelector("#ul-el")
 const deleteBtn = document.getElementById("delete-btn")
 
 deleteBtn.addEventListener("dblclick", function () {
-   
+    remove(referenceInDB);
+    ulEl.innerHTML = "";
 } )
 
 inputBtn.addEventListener("click", function() {
@@ -28,10 +30,16 @@ inputBtn.addEventListener("click", function() {
 })
 
 onValue(referenceInDB, function(snapshot) {
-    console.log(snapshot.val());
+    const snapshotDoesExist = snapshot.exists()
+
+    if (snapshotDoesExist) {
+        const snapshotValues = snapshot.val()
+        const leads = Object.values(snapshotValues);
+        render(leads);
+    }
 })
 
-function renderLeads(leads) {
+function render(leads) {
     let listItems = ""
     for (let i = 0; i < leads.length; i++){
         listItems += `
