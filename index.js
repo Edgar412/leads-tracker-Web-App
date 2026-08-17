@@ -4,13 +4,25 @@ import { getDatabase,
          ref,
          push,
          onValue,
-         remove } from "https://www.gstatic.com/firebasejs/12.17.0/firebase-database.js";
+         remove,
+         getAuth,
+         onAuthStateChanged } from "https://www.gstatic.com/firebasejs/12.17.0/firebase-database.js";
 import { firebaseConfig} from "./config.js";
 
 //database varibles
 const app = initializeApp(firebaseConfig);
+const auth = getAuth(app);
+
+onAuthStateChanged(auth, (user) => {
+    if (!user) {
+        window.location.href = "login.html";
+    } else {
+        console.log("Logged in user ID: ", user.uid);
+    }
+})
+
 const database = getDatabase(app)
-const referenceInDB = ref(database, "leads");
+const userLeadsRef = ref(database, 'users/' + user.uid + "/leads");
 
 
 //progam varibales
@@ -20,16 +32,16 @@ const ulEl = document.querySelector("#ul-el")
 const deleteBtn = document.getElementById("delete-btn")
 
 deleteBtn.addEventListener("dblclick", function () {
-    remove(referenceInDB);
+    remove(userLeadsRef);
     ulEl.innerHTML = "";
 } )
 
 inputBtn.addEventListener("click", function() {
-    push(referenceInDB, inputEl.value)
+    push(userLeadsRef, inputEl.value)
     inputEl.value = ""
 })
 
-onValue(referenceInDB, function(snapshot) {
+onValue(userLeadsRef, function(snapshot) {
     const snapshotDoesExist = snapshot.exists()
 
     if (snapshotDoesExist) {
